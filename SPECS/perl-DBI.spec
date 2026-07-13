@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.643
-Release:        26%{?dist}
+Release:        26%{?dist}.1
 Summary:        A database access API for perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            http://dbi.perl.org/
@@ -44,6 +44,8 @@ Patch0:         DBI-1.643-Fix-for-CVE-2014-10401.patch
 Patch1:         DBI-1.643-Fix-for-empty-attributes-in-DSN.patch
 Patch2:         DBI-1.643-Catch-warning.patch
 Patch3:         DBI-1.643-Document-the-new-behavior-for-f_dir.patch
+# RHEL-184980, CVE-2026-9698, Fix possible stack overflow and buffer overflow in DBI.xs
+Patch4:         DBI-1.643-Fix-CVE-2026-9698.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -277,6 +279,10 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Fri Jun 19 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.1
+- Fix CVE-2026-9698: stack overflow and buffer overflow in DBI.xs
+- Resolves: RHEL-184980
+
 * Tue Oct 29 2024 Troy Dawson <tdawson@redhat.com> - 1.643-26
 - Bump release for October 2024 mass rebuild:
   Resolves: RHEL-64018
