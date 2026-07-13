@@ -34,11 +34,13 @@
 
 Name:           perl-DBI
 Version:        1.643
-Release:        9%{?dist}
+Release:        9%{?dist}.1
 Summary:        A database access API for perl
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
 Source0:        https://cpan.metacpan.org/authors/id/T/TI/TIMB/DBI-%{version}.tar.gz
+# RHEL-184984, CVE-2026-9698, Fix possible stack overflow and buffer overflow in DBI.xs
+Patch0:         DBI-1.643-Fix-CVE-2026-9698.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -154,6 +156,7 @@ the use of existing DBI frameworks like DBIx::Class.
 
 %prep
 %setup -q -n DBI-%{version} 
+%patch0 -p1
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -218,6 +221,11 @@ make test
 %endif
 
 %changelog
+* Thu Jun 18 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-9.1
+- Fix possible stack overflow and buffer overflow in DBI.xs
+  (CVE-2026-9698)
+- Resolves: RHEL-184984
+
 * Mon Aug 09 2021 Mohan Boddu <mboddu@redhat.com> - 1.643-9
 - Rebuilt for IMA sigs, glibc 2.34, aarch64 flags
   Related: rhbz#1991688
