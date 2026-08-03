@@ -34,13 +34,17 @@
 
 Name:           perl-DBI
 Version:        1.643
-Release:        9%{?dist}.1
+Release:        9%{?dist}.3
 Summary:        A database access API for perl
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
 Source0:        https://cpan.metacpan.org/authors/id/T/TI/TIMB/DBI-%{version}.tar.gz
 # RHEL-184984, CVE-2026-9698, Fix possible stack overflow and buffer overflow in DBI.xs
 Patch0:         DBI-1.643-Fix-CVE-2026-9698.patch
+# RHEL-193306, CVE-2026-14739, Set a hard limit of 99999 on '?' placeholders
+Patch1:         DBI-1.643-Fix-CVE-2026-14739.patch
+# RHEL-211149, CVE-2026-14380, Fix unsafe string eval in DBI::Profile
+Patch2:         DBI-1.643-Fix-CVE-2026-14380.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -157,6 +161,8 @@ the use of existing DBI frameworks like DBIx::Class.
 %prep
 %setup -q -n DBI-%{version} 
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -221,6 +227,14 @@ make test
 %endif
 
 %changelog
+* Thu Jul 16 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-9.3
+- Fix unsafe string eval in DBI::Profile (CVE-2026-14380)
+- Resolves: RHEL-211149
+
+* Fri Jul 10 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-9.2
+- Set a hard limit of 99999 on '?' placeholders (CVE-2026-14739)
+- Resolves: RHEL-193306
+
 * Thu Jun 18 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-9.1
 - Fix possible stack overflow and buffer overflow in DBI.xs
   (CVE-2026-9698)
