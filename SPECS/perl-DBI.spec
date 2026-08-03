@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.643
-Release:        26%{?dist}.1
+Release:        26%{?dist}.3
 Summary:        A database access API for perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            http://dbi.perl.org/
@@ -46,6 +46,10 @@ Patch2:         DBI-1.643-Catch-warning.patch
 Patch3:         DBI-1.643-Document-the-new-behavior-for-f_dir.patch
 # RHEL-184980, CVE-2026-9698, Fix possible stack overflow and buffer overflow in DBI.xs
 Patch4:         DBI-1.643-Fix-CVE-2026-9698.patch
+# RHEL-193293, CVE-2026-14739, Set a hard limit of 99999 on '?' placeholders
+Patch5:         DBI-1.643-Fix-CVE-2026-14739.patch
+# RHEL-211146, CVE-2026-14380, Load profile packages using Module::Load
+Patch6:         DBI-1.643-Fix-CVE-2026-14380.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -279,6 +283,14 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Thu Jul 16 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.3
+- Fix CVE-2026-14380: unsafe string eval in DBI::Profile
+- Resolves: RHEL-211146
+
+* Fri Jul 10 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.2
+- Fix CVE-2026-14739: set a hard limit of 99999 on '?' placeholders
+- Resolves: RHEL-193293
+
 * Fri Jun 19 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.1
 - Fix CVE-2026-9698: stack overflow and buffer overflow in DBI.xs
 - Resolves: RHEL-184980
