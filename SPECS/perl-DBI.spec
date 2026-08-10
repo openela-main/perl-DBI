@@ -34,13 +34,17 @@
 
 Name:           perl-DBI
 Version:        1.641
-Release:        5%{?dist}
+Release:        8%{?dist}
 Summary:        A database access API for perl
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
 Source0:        http://www.cpan.org/authors/id/T/TI/TIMB/DBI-%{version}.tar.gz
 # RHEL-184974, CVE-2026-9698, Fix stack overflow and buffer overflow in DBI.xs
 Patch0:         DBI-1.641-Fix-CVE-2026-9698.patch
+# RHEL-193298, CVE-2026-14739, Heap overflow when preparsing SQL statements with excessive placeholders
+Patch1:         DBI-1.643-Fix-CVE-2026-14739.patch
+# RHEL-211149, CVE-2026-14380, Fix unsafe string eval in DBI::Profile
+Patch2:         DBI-1.643-Fix-CVE-2026-14380.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -78,6 +82,7 @@ BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Select)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Math::BigInt)
+BuildRequires:  perl(Module::Load)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Storable)
 BuildRequires:  perl(Symbol)
@@ -157,6 +162,8 @@ the use of existing DBI frameworks like DBIx::Class.
 %prep
 %setup -q -n DBI-%{version} 
 %patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -220,6 +227,17 @@ make test
 %endif
 
 %changelog
+* Mon Aug 03 2026 Michal Josef Špaček <mspacek@redhat.com> - 1.641-8
+- Fix unsafe string eval in DBI::Profile (CVE-2026-14380)
+  Resolves: RHEL-211151
+
+* Tue Jul 28 2026 Michal Josef Špaček <mspacek@redhat.com> - 1.641-7
+- Fix patch.
+
+* Tue Jul 28 2026 Michal Josef Špaček <mspacek@redhat.com> - 1.641-6
+- Fix heap overflow when preparsing SQL statements with excessive placeholders (CVE-2026-14739)
+  Resolves: RHEL-193298
+
 * Mon Jun 22 2026 Michal Josef Špaček <mspacek@redhat.com> - 1.641-5
 - Fix stack overflow and buffer overflow in DBI.xs (CVE-2026-9698)
   Resolves: RHEL-184974
