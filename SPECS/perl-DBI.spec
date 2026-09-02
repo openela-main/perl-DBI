@@ -34,11 +34,19 @@
 
 Name:           perl-DBI
 Version:        1.641
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A database access API for perl
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
 Source0:        http://www.cpan.org/authors/id/T/TI/TIMB/DBI-%{version}.tar.gz
+# RHEL-211160, CVE-2026-9698, Fix stack overflow and buffer overflow in DBI.xs
+Patch0:         DBI-1.641-Fix-CVE-2026-9698.patch
+# RHEL-227962, CVE-2026-10879, Heap overflow in SQL preparsing can lead to denial of service or arbitrary code execution
+Patch1:         DBI-1.641-Fix-CVE-2026-10879.patch
+# RHEL-193292, CVE-2026-14739, Heap overflow when preparsing SQL statements with excessive placeholders
+Patch2:         DBI-1.643-Fix-CVE-2026-14739.patch
+# RHEL-211158, CVE-2026-14380, Fix unsafe string eval in DBI::Profile
+Patch3:         DBI-1.643-Fix-CVE-2026-14380.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -67,6 +75,7 @@ BuildRequires:  perl(DynaLoader)
 BuildRequires:  perl(Errno)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(Fcntl)
+BuildRequires:  perl(FileHandle)
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(Getopt::Long)
@@ -75,6 +84,7 @@ BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Select)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Math::BigInt)
+BuildRequires:  perl(Module::Load)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Storable)
 BuildRequires:  perl(Symbol)
@@ -99,6 +109,7 @@ BuildRequires:  perl(MLDBM)
 BuildRequires:  perl(SQL::Statement) >= 1.402
 %endif
 # Tests
+BuildRequires:  perl(blib)
 BuildRequires:  perl(B)
 BuildRequires:  perl(Benchmark)
 BuildRequires:  perl(Encode)
@@ -120,6 +131,7 @@ Suggests:       perl(Clone) >= 0.34
 %if %{with perl_DBI_enables_DB_File}
 Suggests:       perl(DB_File)
 %endif
+Requires:       perl(FileHandle)
 Requires:       perl(Math::BigInt)
 %if %{with perl_DBI_enables_MLDBM}
 Suggests:       perl(MLDBM)
@@ -151,6 +163,10 @@ the use of existing DBI frameworks like DBIx::Class.
 
 %prep
 %setup -q -n DBI-%{version} 
+%patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
+%patch -P3 -p1
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -214,6 +230,17 @@ make test
 %endif
 
 %changelog
+* Tue Aug 11 2026 Michal Josef Špaček <mspacek@redhat.com> - 1.641-2
+- Fix stack overflow and buffer overflow in DBI.xs (CVE-2026-9698)
+  Resolves: RHEL-211160
+- Fix heap overflow in SQL preparsing can lead to denial of service or arbitrary code execution (CVE-2026-10879)
+  Resolves: RHEL-227962
+- Fix unsafe string eval in DBI::Profile (CVE-2026-14380)
+  Resolves: RHEL-211158
+- Fix heap overflow when preparsing SQL statements with excessive placeholders (CVE-2026-14739)
+  Resolves: RHEL-193292
+- BR: perl(blib), perl(FileHandle) for tests
+
 * Tue Mar 20 2018 Petr Pisar <ppisar@redhat.com> - 1.641-1
 - 1.641 bump
 
