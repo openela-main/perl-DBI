@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.643
-Release:        26%{?dist}.3
+Release:        26%{?dist}.4
 Summary:        A database access API for perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            http://dbi.perl.org/
@@ -50,6 +50,8 @@ Patch4:         DBI-1.643-Fix-CVE-2026-9698.patch
 Patch5:         DBI-1.643-Fix-CVE-2026-14739.patch
 # RHEL-211146, CVE-2026-14380, Load profile packages using Module::Load
 Patch6:         DBI-1.643-Fix-CVE-2026-14380.patch
+# RHEL-236830, CVE-2026-19546, Use Module::Load for proper module name validation
+Patch7:         DBI-1.643-Fix-CVE-2026-19546.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -67,6 +69,7 @@ BuildRequires:  perl(base)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Config)
+BuildRequires:  perl(Module::Load) >= 0.22
 %if %{with perl_DBI_enables_coro}
 # Coro Not needed by tests
 # Coro::Handle not needed by tests
@@ -134,6 +137,7 @@ Suggests:       perl(DB_File)
 %endif
 Requires:       perl(FileHandle)
 Requires:       perl(Math::BigInt)
+Requires:       perl(Module::Load) >= 0.22
 %if %{with perl_DBI_enables_MLDBM}
 Suggests:       perl(MLDBM)
 %endif
@@ -146,6 +150,7 @@ Suggests:       perl(SQL::Statement) >= 1.402
 %global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\(RPC::\\)
 %global __requires_exclude %{__requires_exclude}|^perl\\(DBI::db\\)
 %global __requires_exclude %{__requires_exclude}|^perl\\(DBI::st\\)
+%global __requires_exclude %{__requires_exclude}|^perl\\(Module::Load\\)
 
 %description 
 DBI is a database access Application Programming Interface (API) for
@@ -283,6 +288,11 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Aug 12 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.4
+- Fix CVE-2026-19546: incomplete fix for CVE-2026-14380 in
+  DBI::Profile
+  Resolves: RHEL-236830
+
 * Thu Jul 16 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.3
 - Fix CVE-2026-14380: unsafe string eval in DBI::Profile
 - Resolves: RHEL-211146
