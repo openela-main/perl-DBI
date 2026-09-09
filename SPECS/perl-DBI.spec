@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.643
-Release:        9%{?dist}.3
+Release:        9%{?dist}.5
 Summary:        A database access API for perl
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
@@ -45,6 +45,8 @@ Patch0:         DBI-1.643-Fix-CVE-2026-9698.patch
 Patch1:         DBI-1.643-Fix-CVE-2026-14739.patch
 # RHEL-211149, CVE-2026-14380, Fix unsafe string eval in DBI::Profile
 Patch2:         DBI-1.643-Fix-CVE-2026-14380.patch
+# RHEL-236831, CVE-2026-19546, Use Module::Load for safer package loading in DBI::Profile
+Patch3:         DBI-1.643-Fix-CVE-2026-19546.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -82,6 +84,7 @@ BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Select)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Math::BigInt)
+BuildRequires:  perl(Module::Load)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Storable)
 BuildRequires:  perl(Symbol)
@@ -163,6 +166,7 @@ the use of existing DBI frameworks like DBIx::Class.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -227,6 +231,11 @@ make test
 %endif
 
 %changelog
+* Tue Sep 08 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-9.5
+- Use Module::Load for safer package loading in DBI::Profile
+  (CVE-2026-19546)
+  Related: RHEL-236831
+
 * Thu Jul 16 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-9.3
 - Fix unsafe string eval in DBI::Profile (CVE-2026-14380)
 - Resolves: RHEL-211149
