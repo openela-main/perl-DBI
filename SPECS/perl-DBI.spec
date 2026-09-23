@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.643
-Release:        26%{?dist}.4
+Release:        26%{?dist}.6
 Summary:        A database access API for perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            http://dbi.perl.org/
@@ -52,6 +52,8 @@ Patch5:         DBI-1.643-Fix-CVE-2026-14739.patch
 Patch6:         DBI-1.643-Fix-CVE-2026-14380.patch
 # RHEL-236830, CVE-2026-19546, Use Module::Load for proper module name validation
 Patch7:         DBI-1.643-Fix-CVE-2026-19546.patch
+# RHEL-247316, CVE-2026-73194, Force placeholder limit on :# and :p# too
+Patch8:         DBI-1.643-Fix-CVE-2026-73194.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -288,6 +290,11 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Thu Sep 10 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.6
+- Fix CVE-2026-73194: enforce placeholder range limit on :N style
+  placeholders
+  Resolves: RHEL-247316
+
 * Wed Aug 12 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.4
 - Fix CVE-2026-19546: incomplete fix for CVE-2026-14380 in
   DBI::Profile
