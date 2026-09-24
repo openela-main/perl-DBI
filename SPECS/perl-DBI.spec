@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.643
-Release:        9%{?dist}.5
+Release:        9%{?dist}.6
 Summary:        A database access API for perl
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
@@ -47,6 +47,8 @@ Patch1:         DBI-1.643-Fix-CVE-2026-14739.patch
 Patch2:         DBI-1.643-Fix-CVE-2026-14380.patch
 # RHEL-236831, CVE-2026-19546, Use Module::Load for safer package loading in DBI::Profile
 Patch3:         DBI-1.643-Fix-CVE-2026-19546.patch
+# RHEL-247327, CVE-2026-73194, Force placeholder limit on :# and :p# too
+Patch4:         DBI-1.643-Fix-CVE-2026-73194.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -167,6 +169,7 @@ the use of existing DBI frameworks like DBIx::Class.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -231,6 +234,10 @@ make test
 %endif
 
 %changelog
+* Wed Sep 09 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-9.6
+- Force placeholder limit on :# and :p# too (CVE-2026-73194)
+  Related: RHEL-247327
+
 * Tue Sep 08 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-9.5
 - Use Module::Load for safer package loading in DBI::Profile
   (CVE-2026-19546)
