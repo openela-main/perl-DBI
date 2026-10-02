@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.641
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A database access API for perl
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
@@ -47,6 +47,8 @@ Patch1:         DBI-1.641-Fix-CVE-2026-10879.patch
 Patch2:         DBI-1.643-Fix-CVE-2026-14739.patch
 # RHEL-211158, CVE-2026-14380, Fix unsafe string eval in DBI::Profile
 Patch3:         DBI-1.643-Fix-CVE-2026-14380.patch
+# RHEL-247320, CVE-2026-73194, Force placeholder limit on :# and :p# too
+Patch4:         DBI-1.641-Fix-CVE-2026-73194.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -167,6 +169,7 @@ the use of existing DBI frameworks like DBIx::Class.
 %patch -P1 -p1
 %patch -P2 -p1
 %patch -P3 -p1
+%patch -P4 -p1
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -230,6 +233,10 @@ make test
 %endif
 
 %changelog
+* Wed Sep 09 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.641-3
+- Force placeholder limit on :N and :pN placeholders (CVE-2026-73194)
+  Resolves: RHEL-247320
+
 * Tue Aug 11 2026 Michal Josef Špaček <mspacek@redhat.com> - 1.641-2
 - Fix stack overflow and buffer overflow in DBI.xs (CVE-2026-9698)
   Resolves: RHEL-211160
