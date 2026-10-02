@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.641
-Release:        8%{?dist}
+Release:        10%{?dist}
 Summary:        A database access API for perl
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
@@ -45,6 +45,8 @@ Patch0:         DBI-1.641-Fix-CVE-2026-9698.patch
 Patch1:         DBI-1.643-Fix-CVE-2026-14739.patch
 # RHEL-211149, CVE-2026-14380, Fix unsafe string eval in DBI::Profile
 Patch2:         DBI-1.643-Fix-CVE-2026-14380.patch
+# RHEL-247869, CVE-2026-73194, Force placeholder limit on :# and :p# too
+Patch3:         DBI-1.641-Fix-CVE-2026-73194.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -164,6 +166,7 @@ the use of existing DBI frameworks like DBIx::Class.
 %patch -P0 -p1
 %patch -P1 -p1
 %patch -P2 -p1
+%patch -P3 -p1
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -227,6 +230,14 @@ make test
 %endif
 
 %changelog
+* Fri Sep 11 2026 Michal Josef Špaček <mspacek@redhat.com> - 1.641-10
+- Fix number of tests
+  Resolves: RHEL-247869
+
+* Thu Sep 10 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.641-9
+- Fix placeholder limit on :N and :pN style placeholders (CVE-2026-73194)
+  Resolves: RHEL-247869
+
 * Mon Aug 03 2026 Michal Josef Špaček <mspacek@redhat.com> - 1.641-8
 - Fix unsafe string eval in DBI::Profile (CVE-2026-14380)
   Resolves: RHEL-211151
