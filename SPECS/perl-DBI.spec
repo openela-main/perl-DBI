@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.643
-Release:        9%{?dist}.6
+Release:        9%{?dist}.7
 Summary:        A database access API for perl
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
@@ -49,6 +49,8 @@ Patch2:         DBI-1.643-Fix-CVE-2026-14380.patch
 Patch3:         DBI-1.643-Fix-CVE-2026-19546.patch
 # RHEL-247327, CVE-2026-73194, Force placeholder limit on :# and :p# too
 Patch4:         DBI-1.643-Fix-CVE-2026-73194.patch
+# RHEL-271974, CVE-2026-88815, Fix DBI::sql_type_cast on IV/NV
+Patch5:         DBI-1.643-Fix-CVE-2026-88815.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -170,6 +172,7 @@ the use of existing DBI frameworks like DBIx::Class.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -234,6 +237,11 @@ make test
 %endif
 
 %changelog
+* Mon Sep 28 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-9.7
+- CVE-2026-88815 perl-DBI: perl-DBI: Denial of Service via invalid memory read during numeric type casting
+  memory read during numeric type casting
+  Resolves: RHEL-271974
+
 * Wed Sep 09 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-9.6
 - Force placeholder limit on :# and :p# too (CVE-2026-73194)
   Related: RHEL-247327
