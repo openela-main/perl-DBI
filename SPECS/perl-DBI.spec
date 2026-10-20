@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.641
-Release:        10%{?dist}
+Release:        11%{?dist}
 Summary:        A database access API for perl
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
@@ -47,6 +47,8 @@ Patch1:         DBI-1.643-Fix-CVE-2026-14739.patch
 Patch2:         DBI-1.643-Fix-CVE-2026-14380.patch
 # RHEL-247869, CVE-2026-73194, Force placeholder limit on :# and :p# too
 Patch3:         DBI-1.641-Fix-CVE-2026-73194.patch
+# RHEL-271961, CVE-2026-88815, Fix DBI::sql_type_cast on IV/NV
+Patch4:         DBI-1.641-Fix-CVE-2026-88815.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -167,6 +169,7 @@ the use of existing DBI frameworks like DBIx::Class.
 %patch -P1 -p1
 %patch -P2 -p1
 %patch -P3 -p1
+%patch -P4 -p1
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -230,6 +233,11 @@ make test
 %endif
 
 %changelog
+* Mon Oct 05 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.641-11
+- CVE-2026-88815 perl-DBI: perl-DBI: Denial of Service via invalid memory read during numeric type casting
+  read during numeric type casting
+  Resolves: RHEL-271961
+
 * Fri Sep 11 2026 Michal Josef Špaček <mspacek@redhat.com> - 1.641-10
 - Fix number of tests
   Resolves: RHEL-247869
