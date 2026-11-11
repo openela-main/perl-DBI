@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.641
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A database access API for perl
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
@@ -51,6 +51,8 @@ Patch3:         DBI-1.643-Fix-CVE-2026-14380.patch
 Patch4:         DBI-1.641-Fix-CVE-2026-73194.patch
 # RHEL-271960, CVE-2026-88815, Fix DBI::sql_type_cast on IV/NV
 Patch5:         DBI-1.641-Fix-CVE-2026-88815.patch
+# RHEL-277689, CVE-2026-78030, Load serializer class using Module::Load in DBD::DBM
+Patch6:         DBI-1.641-Fix-CVE-2026-78030.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -119,6 +121,7 @@ BuildRequires:  perl(Benchmark)
 BuildRequires:  perl(Encode)
 BuildRequires:  perl(File::Copy)
 BuildRequires:  perl(File::Path)
+BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(overload)
 BuildRequires:  perl(Test::More)
@@ -173,6 +176,7 @@ the use of existing DBI frameworks like DBIx::Class.
 %patch -P3 -p1
 %patch -P4 -p1
 %patch -P5 -p1
+%patch -P6 -p1
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -236,9 +240,12 @@ make test
 %endif
 
 %changelog
+* Mon Nov 02 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.641-5
+- CVE-2026-78030 perl-DBI: DBI versions before 1.653 for Perl load arbitrary modules via unvalidated dbm_type and dbm_mldbm attributes in DBD::DBM
+  Resolves: RHEL-277689
+
 * Mon Sep 28 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.641-4
 - CVE-2026-88815 perl-DBI: perl-DBI: Denial of Service via invalid memory read during numeric type casting
-  memory read during numeric type casting
   Resolves: RHEL-271960
 
 * Wed Sep 09 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.641-3
