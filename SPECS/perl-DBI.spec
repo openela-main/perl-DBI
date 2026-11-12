@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.643
-Release:        26%{?dist}.7
+Release:        30%{?dist}.3
 Summary:        A database access API for perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            http://dbi.perl.org/
@@ -44,17 +44,17 @@ Patch0:         DBI-1.643-Fix-for-CVE-2014-10401.patch
 Patch1:         DBI-1.643-Fix-for-empty-attributes-in-DSN.patch
 Patch2:         DBI-1.643-Catch-warning.patch
 Patch3:         DBI-1.643-Document-the-new-behavior-for-f_dir.patch
-# RHEL-184980, CVE-2026-9698, Fix possible stack overflow and buffer overflow in DBI.xs
+# RHEL-184982, CVE-2026-9698, Fix possible stack overflow in DBI.xs
 Patch4:         DBI-1.643-Fix-CVE-2026-9698.patch
-# RHEL-193293, CVE-2026-14739, Set a hard limit of 99999 on '?' placeholders
-Patch5:         DBI-1.643-Fix-CVE-2026-14739.patch
-# RHEL-211146, CVE-2026-14380, Load profile packages using Module::Load
-Patch6:         DBI-1.643-Fix-CVE-2026-14380.patch
-# RHEL-236830, CVE-2026-19546, Use Module::Load for proper module name validation
-Patch7:         DBI-1.643-Fix-CVE-2026-19546.patch
-# RHEL-247316, CVE-2026-73194, Force placeholder limit on :# and :p# too
-Patch8:         DBI-1.643-Fix-CVE-2026-73194.patch
-# RHEL-271970, CVE-2026-88815, Fix DBI::sql_type_cast on IV/NV
+# RHEL-211148, CVE-2026-14380, Load profile packages using Module::Load
+Patch5:         DBI-1.643-Fix-CVE-2026-14380.patch
+# RHEL-193295, CVE-2026-14739, Set a hard limit of 99999 on '?' placeholders
+Patch6:         DBI-1.643-Fix-CVE-2026-14739.patch
+# RHEL-247317, CVE-2026-73194, Force placeholder limit on :N and :pN
+Patch7:         DBI-1.643-Fix-CVE-2026-73194.patch
+# RHEL-282729, CVE-2026-78030, Load serializer class using Module::Load
+Patch8:         DBI-1.643-Fix-CVE-2026-78030.patch
+# RHEL-285726, CVE-2026-88815, Fix DBI::sql_type_cast on IV/NV
 Patch9:         DBI-1.643-Fix-CVE-2026-88815.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -73,7 +73,6 @@ BuildRequires:  perl(base)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Config)
-BuildRequires:  perl(Module::Load) >= 0.22
 %if %{with perl_DBI_enables_coro}
 # Coro Not needed by tests
 # Coro::Handle not needed by tests
@@ -94,6 +93,7 @@ BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Select)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Math::BigInt)
+BuildRequires:  perl(Module::Load)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Storable)
 BuildRequires:  perl(Symbol)
@@ -124,6 +124,7 @@ BuildRequires:  perl(Benchmark)
 BuildRequires:  perl(Encode)
 BuildRequires:  perl(File::Copy)
 BuildRequires:  perl(File::Path)
+BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(overload)
 BuildRequires:  perl(Test::More)
@@ -141,7 +142,6 @@ Suggests:       perl(DB_File)
 %endif
 Requires:       perl(FileHandle)
 Requires:       perl(Math::BigInt)
-Requires:       perl(Module::Load) >= 0.22
 %if %{with perl_DBI_enables_MLDBM}
 Suggests:       perl(MLDBM)
 %endif
@@ -154,7 +154,6 @@ Suggests:       perl(SQL::Statement) >= 1.402
 %global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\(RPC::\\)
 %global __requires_exclude %{__requires_exclude}|^perl\\(DBI::db\\)
 %global __requires_exclude %{__requires_exclude}|^perl\\(DBI::st\\)
-%global __requires_exclude %{__requires_exclude}|^perl\\(Module::Load\\)
 
 %description 
 DBI is a database access Application Programming Interface (API) for
@@ -292,32 +291,33 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
-* Mon Sep 28 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.7
+* Mon Nov 09 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-30.3
 - CVE-2026-88815 perl-DBI: perl-DBI: Denial of Service via invalid memory read during numeric type casting
-  memory read during numeric type casting
-  Resolves: RHEL-271970
+  Resolves: RHEL-285726
 
-* Thu Sep 10 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.6
-- Fix CVE-2026-73194: enforce placeholder range limit on :N style
-  placeholders
-  Resolves: RHEL-247316
+* Fri Nov 06 2026 Michal Josef Špaček <mspacek@redhat.com> - 1.643-30.2
+- CVE-2026-78030 perl-DBI: DBI versions before 1.653 for Perl load arbitrary modules via unvalidated dbm_type and dbm_mldbm attributes in DBD::DBM
+  Resolves: RHEL-282729
 
-* Wed Aug 12 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.4
-- Fix CVE-2026-19546: incomplete fix for CVE-2026-14380 in
-  DBI::Profile
-  Resolves: RHEL-236830
+* Mon Oct 19 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-30.1
+- CVE-2026-73194 perl-DBI: DBI for Perl: Heap out-of-bounds write via unvalidated numeric placeholder
+  Resolves: RHEL-247317
 
-* Thu Jul 16 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.3
-- Fix CVE-2026-14380: unsafe string eval in DBI::Profile
-- Resolves: RHEL-211146
+* Mon Aug 24 2026 Michal Josef Špaček <mspacek@redhat.com> - 1.643-30
+- CVE-2026-10879 was fixed in previous change of CVE-2026-14739.
+  Resolves: RHEL-193975
 
-* Fri Jul 10 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.2
+* Mon Aug 24 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-29
 - Fix CVE-2026-14739: set a hard limit of 99999 on '?' placeholders
-- Resolves: RHEL-193293
+  Resolves: RHEL-193295
 
-* Fri Jun 19 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-26.1
-- Fix CVE-2026-9698: stack overflow and buffer overflow in DBI.xs
-- Resolves: RHEL-184980
+* Thu Aug 20 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-28
+- Fix CVE-2026-14380: unsafe eval in DBI::Profile
+  Resolves: RHEL-211148
+
+* Thu Jul 30 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.643-27
+- Fix CVE-2026-9698: stack buffer overflow in DBI.xs
+  Resolves: RHEL-184982
 
 * Tue Oct 29 2024 Troy Dawson <tdawson@redhat.com> - 1.643-26
 - Bump release for October 2024 mass rebuild:
