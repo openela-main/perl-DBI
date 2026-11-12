@@ -34,7 +34,7 @@
 
 Name:           perl-DBI
 Version:        1.641
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        A database access API for perl
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
@@ -49,6 +49,8 @@ Patch2:         DBI-1.643-Fix-CVE-2026-14380.patch
 Patch3:         DBI-1.641-Fix-CVE-2026-73194.patch
 # RHEL-271961, CVE-2026-88815, Fix DBI::sql_type_cast on IV/NV
 Patch4:         DBI-1.641-Fix-CVE-2026-88815.patch
+# RHEL-277690, CVE-2026-78030, Load serializer class using Module::Load
+Patch5:         DBI-1.641-Fix-CVE-2026-78030.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -80,6 +82,7 @@ BuildRequires:  perl(Fcntl)
 BuildRequires:  perl(FileHandle)
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(Getopt::Long)
 BuildRequires:  perl(IO::Dir)
 BuildRequires:  perl(IO::File)
@@ -170,6 +173,7 @@ the use of existing DBI frameworks like DBIx::Class.
 %patch -P2 -p1
 %patch -P3 -p1
 %patch -P4 -p1
+%patch -P5 -p1
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -233,8 +237,14 @@ make test
 %endif
 
 %changelog
+* Thu Oct 29 2026 Michal Josef Špaček <mspacek@redhat.com> - 1.641-12
+- CVE-2026-78030 perl-DBI:1.641/perl-DBI: DBI versions before 1.653 for
+  Perl load arbitrary modules via unvalidated dbm_type and dbm_mldbm
+  attributes in DBD::DBM
+  Resolves: RHEL-277690
+
 * Mon Oct 05 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.641-11
-- CVE-2026-88815 perl-DBI: perl-DBI: Denial of Service via invalid memory read during numeric type casting
+- CVE-2026-88815 perl-DBI: perl-DBI: Denial of Service via invalid memory
   read during numeric type casting
   Resolves: RHEL-271961
 
